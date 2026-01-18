@@ -21,4 +21,4 @@
     - the Deployment System that deploys binaries to our machines across the world
 
 ### System Diagram
-![Code Deployment Diagram](../images/code-deployment-system.md) 
+![Code Deployment Diagram](../images/code-deployment-system-diagram.svg) 
