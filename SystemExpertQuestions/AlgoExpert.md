@@ -13,3 +13,20 @@
 ### 6. 
 ## Diagram
 ![AlgoExpert Diagram](../images/algoexpert-system-diagram.svg)
+### Explain of the Diagram
+#### 1. What This System Is
+- This diagram represents a **globally distributed, multi-region online code-execution platform** (think LeetCode / HackerRank–style system):
+    - Users authenticate
+    - Browse questions
+    - Submit code
+    - Code is executed securely
+
+- The design emphasizes:
+    - Low latency
+    - Regional isolation
+    - Scalability
+    - Fault tolerance
+    - Controlled cross-region replication
+#### 2. User Entry & Traffic Routing (Bottom)
+- **UI / Static Assets**
+    - Delivered to users via CDN PoPs

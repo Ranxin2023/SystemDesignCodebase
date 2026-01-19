@@ -1,15 +1,5 @@
 # Design A Code-Deployment System
 ## Question to Think About
-### 1. What exactly do we mean by a code-deployment system? Are we talking about building, testing, and shipping code?
-### 2. What part of the software-development lifecycle, so to speak, are we designing this for? Is this process of building and deploying code happening when code is being submitted for code review, when code is being merged into a codebase, or when code is being shipped?
-### 3. Are we essentially trying to ship code to production by sending it to, presumably, all of our application servers around the world?
-### 4. How many machines are we deploying to? Are they located all over the world?
-### 5. This sounds like an internal system. Is there any sense of urgency in deploying this code? Can we afford failures in the deployment process? How fast do we want a single deployment to take?
-### 6. So it sounds like we want our system to be available, but not necessarily highly available, we want a clear end-state for builds, and we want the entire process of building and deploying code to take roughly 30 minutes. Is that correct?
-### 7. How often will we be building and deploying code, how long does it take to build code, and how big can the binaries that we'll be deploying get?
-### 8. When building code, how do we have access to the actual code? Is there some sort of reference that we can use to grab code to build?
-
-## Answer to These Questions
 ### Q1. What exactly do we mean by a code-deployment system? Are we talking about building, testing, and shipping code?
 - We want to design a system that takes code, builds it into a binary (an opaque blob of data—the compiled code), and deploys the result globally in an efficient and scalable way. We don't need to worry about testing code; let's assume that's already covered.
 ### Q2. What part of the software-development lifecycle, so to speak, are we designing this for? Is this process of building and deploying code happening when code is being submitted for code review, when code is being merged into a codebase, or when code is being shipped?
@@ -87,11 +77,11 @@ COMMIT;
 - The goal-state will be the desired build version at any point in time and will look something like: "current_build: B1", and this can be stored in some dynamic configuration service (a key-value store like Etcd or ZooKeeper). We'll have a global goal-state as well as regional goal-states.
 - Each regional cluster will have a K-V store that holds configuration for that cluster about what builds should be running on that cluster, and we'll also have a global K-V store.
 
-### System Diagram
+## System Diagram
 ![Code Deployment Diagram](../images/code-deployment-system-diagram.svg)
 
-#### Explain of the Diagram
-##### 1. High-Level Purpose of the System
+### Explain of the Diagram
+#### 1. High-Level Purpose of the System
 - This diagram represents a **globally distributed code-deployment system** whose job is to:
     - Accept a **build request**
     - Build the code using many workers
@@ -100,12 +90,12 @@ COMMIT;
     - Coordinate deployment to many hosts
     - Track deployment progress and final state
 - The system prioritizes **correctness**, **consistency**, and **observability** over ultra-low latency.
-##### 2. Entry Point: Create Build (Bottom of Diagram)
+#### 2. Entry Point: Create Build (Bottom of Diagram)
 - **Create Build** is the starting action.
 - **Why this exists**
     - Scalability: many engineers can trigger builds concurrently
     - Fault tolerance: one API server going down doesn’t stop builds
-##### 3. Build Metadata & Orchestration Layer
+#### 3. Build Metadata & Orchestration Layer
 - **SQL Database (or Message Bus)**
     - This component stores:
         - Build metadata (build ID, commit hash, timestamps)
@@ -114,4 +104,10 @@ COMMIT;
     - Alternatively, this could be:
         - A message queue (Kafka / SQS)
         - A task scheduler
-##### 4. Worker Fleet (Horizontal Scaling)
+#### 4. Worker Fleet (Horizontal Scaling)
+- Below the SQL database is a **large pool of workers** (100+).
+- Each worker:
+    - Pulls build tasks
+    - Fetches source code
+    - Builds binaries or artifacts
+    - Uploads outputs to blob storage
